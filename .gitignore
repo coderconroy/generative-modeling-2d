@@ -1,1 +1,3 @@
 dataset/
+ignore/
+__pycache__/
