@@ -5,8 +5,9 @@ import haiku as hk
 import chex
 from typing import Iterator
 import os
+from scipy.stats import gaussian_kde
 
-data_dir = 'dataset'
+data_dir = 'data'
 def load_dataset(dataset_name: str):
     X_train = np.load(os.path.join(data_dir, f'X_train_{dataset_name}.npy'))
     X_test = np.load(os.path.join(data_dir, f'X_test_{dataset_name}.npy'))
@@ -14,7 +15,15 @@ def load_dataset(dataset_name: str):
     return X_train, X_test
 
 def save_samples(model_name:str, dataset_name: str, X_sample: jax.Array):
-    np.save(os.path.join(data_dir, f'{model_name}_{dataset_name}_samples.npy'), X_sample)
+    np.save(os.path.join(data_dir, f'samples_{model_name}_{dataset_name}.npy'), X_sample)
+
+def save_losses(model_name:str, dataset_name: str, X_sample: jax.Array):
+    np.save(os.path.join(data_dir, f'losses_{model_name}_{dataset_name}.npy'), X_sample)
+
+def compute_mean_log_likelihood(samples, X_test):
+    kde_model = gaussian_kde(samples.T)
+    log_likelihood = kde_model.logpdf(X_test.T)
+    return np.mean(log_likelihood)
 
 class BatchManager(Iterator[np.ndarray]):
     def __init__(self, data: np.ndarray, batch_size: int, key: chex.PRNGKey):
