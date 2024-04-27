@@ -14,11 +14,21 @@ def load_dataset(dataset_name: str):
 
     return X_train, X_test
 
-def save_samples(model_name:str, dataset_name: str, X_sample: jax.Array):
-    np.save(os.path.join(data_dir, f'samples_{model_name}_{dataset_name}.npy'), X_sample)
+def save_samples(model_name:str, dataset_name: str, samples: jax.Array):
+    np.save(os.path.join(data_dir, f'samples_{model_name}_{dataset_name}.npy'), samples)
 
-def save_losses(model_name:str, dataset_name: str, X_sample: jax.Array):
-    np.save(os.path.join(data_dir, f'losses_{model_name}_{dataset_name}.npy'), X_sample)
+def save_losses(model_name:str, dataset_name: str, losses: dict):
+    np.save(os.path.join(data_dir, f'losses_{model_name}_{dataset_name}.npy'), losses)
+
+def load_samples(model_name: str, dataset_name: str) -> jax.Array:
+    return np.load(os.path.join(data_dir, f'samples_{model_name}_{dataset_name}.npy'), allow_pickle=True)
+
+def load_losses(model_name: str, dataset_name: str) -> dict:
+    losses = np.load(os.path.join(data_dir, f'losses_{model_name}_{dataset_name}.npy'), allow_pickle=True)
+    losses = losses.item()
+    convert = lambda data: np.array([float(x.item()) for x in data])
+    losses = {key: convert(losses[key]) for key in losses}
+    return losses
 
 def compute_mean_log_likelihood(samples, X_test):
     kde_model = gaussian_kde(samples.T)
