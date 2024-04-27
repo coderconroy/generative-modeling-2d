@@ -51,15 +51,16 @@ class VAE(nn.Module):
         x_recon = self.decoder(z)
         return x_recon, mean, log_var
     
-def create_model(config):
-    return VAE(
+def create_model(config: dict):
+    model = VAE(
         enc_layer_dim=config['enc_layer_dim'],
         dec_layer_dim=config['dec_layer_dim'],
         latent_dim=config['latent_dim'],
         output_dim=config['output_dim']
     )
+    return model
 
-def train_model(model, config, X_train, X_test):
+def train_model(model: VAE, config: dict, X_train: jax.Array, X_test: jax.Array):
     optimizer = optax.adam(learning_rate=config['learning_rate'])
     prng_seq = hk.PRNGSequence(jax.random.PRNGKey(0))
 
